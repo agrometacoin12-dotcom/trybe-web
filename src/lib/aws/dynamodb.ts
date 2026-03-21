@@ -1,17 +1,12 @@
-// DynamoDB REST API with SigV4 signing — no SDK
+// DynamoDB REST API — proxied through /api/db to avoid CORS + keep secrets server-side
 import { AWSConfig } from './config'
-import { signedRequest } from './sigv4'
-
-const endpoint = `https://dynamodb.${AWSConfig.region}.amazonaws.com`
 
 async function dynamoRequest(target: string, body: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const bodyStr = JSON.stringify(body)
-  const headers = await signedRequest('POST', endpoint, {
-    'content-type': 'application/x-amz-json-1.0',
-    'x-amz-target': target,
-  }, bodyStr, 'dynamodb')
-
-  const res = await fetch(endpoint, { method: 'POST', headers, body: bodyStr })
+  const res = await fetch('/api/db', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ target, body }),
+  })
   const json = await res.json()
 
   if (!res.ok) {

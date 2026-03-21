@@ -1,16 +1,11 @@
-// Cognito REST API — direct HTTP, no SDK
+// Cognito REST API — proxied through /api/auth to avoid CORS
 import { AWSConfig } from './config'
 
-const endpoint = AWSConfig.cognitoEndpoint
-
 async function cognitoRequest(target: string, body: Record<string, unknown>) {
-  const res = await fetch(endpoint, {
+  const res = await fetch('/api/auth', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-amz-json-1.1',
-      'X-Amz-Target': `AWSCognitoIdentityProviderService.${target}`,
-    },
-    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ target, body }),
   })
   const json = await res.json()
   if (!res.ok) {
