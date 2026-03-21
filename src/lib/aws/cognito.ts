@@ -20,7 +20,7 @@ async function cognitoRequest(target: string, body: Record<string, unknown>) {
       ExpiredCodeException: 'Verification code expired, request a new one.',
       TooManyRequestsException: 'Too many attempts, please wait.',
     }
-    throw new Error(errMap[errType] || json.message || json.Message || errType)
+    throw new Error(errMap[errType] || json.message || json.Message || json.error || errType)
   }
   return json
 }
